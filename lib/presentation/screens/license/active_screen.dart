@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:squaad_app/config/constants/environment.dart';
 
 class ActiveLicenseScreen extends StatelessWidget {
   static const name = 'active-license';
@@ -6,6 +7,10 @@ class ActiveLicenseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(), body: Placeholder());
+    return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: Text(Environment.squaadUrl),
+        ));
   }
 }
