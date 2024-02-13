@@ -1,3 +1,3 @@
 abstract class SquaadDatasouce {
-  Future<void> activeLicence(String license);
+  Future<List<String>> activeLicence(String license);
 }
