@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../config/constants/sizes.dart';
@@ -96,7 +97,16 @@ class SponsorAndInfo extends StatelessWidget {
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
                 0.50,
-            child: const Placeholder(),
+            child: Swiper(
+              autoplay: true,
+              itemCount: 4,
+              itemBuilder: (context, index) {
+                return Image.asset(
+                  'assets/images/swiper/$index.jpg',
+                  fit: BoxFit.fill,
+                );
+              },
+            ),
           ),
           Container(
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
