@@ -67,6 +67,23 @@ class FormValidateLicense extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? validator(String? value) {
+      if (value == null || value.isEmpty || value.trim().isEmpty) {
+        return 'License key is required';
+      }
+      if (value != '123456789') {
+        return 'License not found';
+      }
+      return null;
+    }
+
+    submit(String? value) {
+      final isValid = formKey.currentState!.validate();
+      if (isValid) {
+        context.go('/dashboard');
+      }
+    }
+
     return Expanded(
       flex: 7,
       child: Container(
@@ -87,14 +104,14 @@ class FormValidateLicense extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    "Activation is required to authenticate this copy of SQUAAD Board. Please Provide a valid License numer to activate your software.",
+                    "Activation is required to authenticate this copy of SQUAAD Board. Please Provide a valid License number to activate your software.",
                     style: TextStyle(
                       fontSize: Sizes.font9,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    "If you do not hace a license number please contact us.",
+                    "If you do not have a license number please contact us.",
                     style: TextStyle(fontSize: Sizes.font9),
                     textAlign: TextAlign.center,
                   ),
@@ -103,6 +120,7 @@ class FormValidateLicense extends StatelessWidget {
                         EdgeInsets.symmetric(vertical: Sizes.overallPadding),
                     child: TextFormField(
                       controller: licenseController,
+                      onFieldSubmitted: submit,
                       style: const TextStyle(
                         color: Colors.black,
                       ),
@@ -111,17 +129,7 @@ class FormValidateLicense extends StatelessWidget {
                         hintText: "LICENSE KEY",
                         hintStyle: TextStyle(color: Colors.grey),
                       ),
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            value.trim().isEmpty) {
-                          return 'License key is required';
-                        }
-                        if (value != '123456789') {
-                          return 'License not found';
-                        }
-                        return null;
-                      },
+                      validator: validator,
                     ),
                   ),
                   Text(
@@ -134,12 +142,7 @@ class FormValidateLicense extends StatelessWidget {
                   ),
                   TextButton(
                       onPressed: () {
-                        final isValid = formKey.currentState!.validate();
-                        if (isValid) {
-                          context.go('/dashboard');
-                        } else {
-                          return;
-                        }
+                        submit(licenseController.text);
                       },
                       child: Text(
                         "VALIDATE",

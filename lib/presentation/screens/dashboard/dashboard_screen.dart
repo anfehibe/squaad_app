@@ -52,15 +52,9 @@ class _PlayerState extends State<Player> {
   YoutubePlayerController controller =
       YoutubePlayerController(initialVideoId: '');
   final List<String> _ids = [
-    'ojI0YeG32uY',
-    'B1HnQqF9mTA',
-    'yJaJCI_jAd8',
-    'QUdKuCrZ-Oo',
-    'CEKKWsjBIBs',
-    '9apc-t51Br8',
-    'Ojxt7rrHOf0',
-    '_2nv62mUL20',
-    'SEGLo0PXfPE',
+    'e8lIJEENUV4',
+    'VWgmG4l2a0c',
+    'nnqIgnxop7A',
   ];
   @override
   void initState() {
