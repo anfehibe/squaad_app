@@ -1,4 +1,4 @@
-package com.example.squaad_app
+package com.acubillos.squaad_app
 
 import io.flutter.embedding.android.FlutterActivity
 

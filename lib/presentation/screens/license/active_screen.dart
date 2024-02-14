@@ -192,7 +192,7 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Sizes.screenHeight * Sizes.headerHeigthPercentage +
+      height: (Sizes.screenHeight * Sizes.headerHeigthPercentage) +
           Sizes.overallPadding,
       color: const Color.fromRGBO(148, 148, 148, 1),
       child: Row(
