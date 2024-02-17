@@ -1,7 +1,9 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../config/constants/sizes.dart';
+import '../../../domain/datasources/shared_preferences_datasource.dart';
 
 class DashboardScreen extends StatelessWidget {
   static const name = 'dashboard';
@@ -50,18 +52,26 @@ class Player extends StatefulWidget {
 }
 
 class _PlayerState extends State<Player> {
-  YoutubePlayerController controller =
-      YoutubePlayerController(initialVideoId: '');
   final List<String> _ids = [
-    'e8lIJEENUV4',
-    'VWgmG4l2a0c',
-    'nnqIgnxop7A',
+    'DcLb2lX6los',
+    'es5Yefj0ncI',
+    '0PA39XnRetE',
+    'eW9XAiYWnPw',
   ];
+  SwiperController swiperController = SwiperController();
+  YoutubePlayerController youtubeController =
+      YoutubePlayerController(initialVideoId: '');
+  List<Map<String, String>> data = [];
   @override
   void initState() {
-    controller = YoutubePlayerController(
+    data = _ids.map((id) => {'type': 'video', 'url': id}).toList();
+    for (var i = 0; i < _ids.length; i++) {
+      data.add({'type': 'img', 'url': '$i'});
+    }
+    youtubeController = YoutubePlayerController(
       initialVideoId: _ids.first,
-      flags: const YoutubePlayerFlags(autoPlay: true, mute: false, loop: false),
+      flags: const YoutubePlayerFlags(
+          autoPlay: false, mute: false, loop: false, hideControls: false),
     );
     super.initState();
   }
@@ -70,12 +80,35 @@ class _PlayerState extends State<Player> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: Sizes.screenWidth * 0.65,
-      child: YoutubePlayer(
-        controller: controller,
-        showVideoProgressIndicator: true,
-        onEnded: (metaData) {
-          controller
-              .load(_ids[(_ids.indexOf(metaData.videoId) + 1) % _ids.length]);
+      child: Swiper(
+        controller: swiperController,
+        autoplay: false,
+        loop: true,
+        itemCount: data.length,
+        itemBuilder: (context, index) {
+          if (data[index]['type'] == "img") {
+            swiperController.startAutoplay();
+
+            return Image.asset(
+              'assets/images/swiper/${data[index]['url']}.jpg',
+              fit: BoxFit.fitHeight,
+            );
+          } else {
+            swiperController.stopAutoplay();
+            youtubeController.load(data[index]['url']!);
+
+            return YoutubePlayer(
+              controller: youtubeController,
+              showVideoProgressIndicator: true,
+              onReady: () {
+                youtubeController.play();
+              },
+              onEnded: (metaData) {
+                youtubeController.pause();
+                swiperController.next();
+              },
+            );
+          }
         },
       ),
     );
@@ -93,19 +126,15 @@ class SponsorAndInfo extends StatelessWidget {
       width: Sizes.screenWidth * 0.35,
       child: Column(
         children: [
-          SizedBox(
+          Container(
+            color: Colors.black,
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
                 0.50,
-            child: Swiper(
-              autoplay: true,
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                return Image.asset(
-                  'assets/images/swiper/$index.jpg',
-                  fit: BoxFit.fill,
-                );
-              },
+            width: double.infinity,
+            child: Image.asset(
+              'assets/images/schools/0.jpg',
+              fit: BoxFit.fitHeight,
             ),
           ),
           Container(
@@ -188,11 +217,17 @@ class HeaderDashboard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-            child: Image.asset(
-              "assets/images/LogoPV.png",
-              fit: BoxFit.contain,
+          InkWell(
+            onLongPress: () {
+              SharedPreferencesDatasource.saveLicense("");
+              context.go('/');
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+              child: Image.asset(
+                "assets/images/LogoPV.png",
+                fit: BoxFit.contain,
+              ),
             ),
           ),
           Padding(
