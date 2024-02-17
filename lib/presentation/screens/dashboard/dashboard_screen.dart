@@ -59,8 +59,7 @@ class _PlayerState extends State<Player> {
     'eW9XAiYWnPw',
   ];
   SwiperController swiperController = SwiperController();
-  YoutubePlayerController youtubeController =
-      YoutubePlayerController(initialVideoId: '');
+
   List<Map<String, String>> data = [];
   @override
   void initState() {
@@ -68,12 +67,14 @@ class _PlayerState extends State<Player> {
     for (var i = 0; i < _ids.length; i++) {
       data.add({'type': 'img', 'url': '$i'});
     }
-    youtubeController = YoutubePlayerController(
-      initialVideoId: _ids.first,
-      flags: const YoutubePlayerFlags(
-          autoPlay: false, mute: false, loop: false, hideControls: false),
-    );
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    swiperController.dispose();
+    super.dispose();
   }
 
   @override
@@ -94,23 +95,64 @@ class _PlayerState extends State<Player> {
               fit: BoxFit.fitHeight,
             );
           } else {
-            swiperController.stopAutoplay();
-            youtubeController.load(data[index]['url']!);
+            swiperController.stopAutoplay(animation: false);
 
-            return YoutubePlayer(
-              controller: youtubeController,
-              showVideoProgressIndicator: true,
-              onReady: () {
-                youtubeController.play();
-              },
-              onEnded: (metaData) {
-                youtubeController.pause();
-                swiperController.next();
-              },
+            return YTPlayer(
+              swiperController: swiperController,
+              url: data[index]['url']!,
             );
           }
         },
       ),
+    );
+  }
+}
+
+class YTPlayer extends StatefulWidget {
+  const YTPlayer({
+    super.key,
+    required this.swiperController,
+    required this.url,
+  });
+  final SwiperController swiperController;
+  final String url;
+
+  @override
+  State<YTPlayer> createState() => _YTPlayerState();
+}
+
+class _YTPlayerState extends State<YTPlayer> {
+  YoutubePlayerController youtubeController =
+      YoutubePlayerController(initialVideoId: '');
+  @override
+  void initState() {
+    youtubeController = YoutubePlayerController(
+      initialVideoId: widget.url,
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+        loop: false,
+        hideControls: true,
+        hideThumbnail: true,
+      ),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    youtubeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return YoutubePlayer(
+      controller: youtubeController,
+      onReady: () {},
+      onEnded: (metaData) {
+        widget.swiperController.next();
+      },
     );
   }
 }
