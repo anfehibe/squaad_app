@@ -41,8 +41,11 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
       body: SizedBox(
         height: Sizes.screenHeight,
         width: Sizes.screenWidth,
-        child: Column(
-          children: const [Header(), Body()],
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            children: const [Header(), Body()],
+          ),
         ),
       ),
     );
@@ -120,73 +123,70 @@ class _FormValidateLicenseState extends State<FormValidateLicense> {
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 130),
       width: Sizes.screenWidth * 0.65,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                "Thank you for installing.",
-                style: TextStyle(fontSize: Sizes.font2),
-                textAlign: TextAlign.center,
+      child: Form(
+        key: formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              "Thank you for installing.",
+              style: TextStyle(fontSize: Sizes.font2),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              "Activation is required to authenticate this copy of SQUAAD Board. Please Provide a valid License number to activate your software.",
+              style: TextStyle(
+                fontSize: Sizes.font9,
               ),
-              Text(
-                "Activation is required to authenticate this copy of SQUAAD Board. Please Provide a valid License number to activate your software.",
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              "If you do not have a license number please contact us.",
+              style: TextStyle(fontSize: Sizes.font9),
+              textAlign: TextAlign.center,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: Sizes.overallPadding),
+              child: TextFormField(
+                controller: licenseController,
+                onFieldSubmitted: submit,
+                style: const TextStyle(
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(
+                  hintText: "LICENSE KEY",
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
+                validator: validator,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.done,
+              ),
+            ),
+            Text(
+              "License Number",
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, fontSize: Sizes.font6),
+            ),
+            SizedBox(
+              height: Sizes.overallPadding * 2,
+            ),
+            TextButton(
+              focusNode: _focusNode,
+              onPressed: () {
+                submit(licenseController.text);
+              },
+              child: Text(
+                "VALIDATE",
                 style: TextStyle(
-                  fontSize: Sizes.font9,
-                ),
-                textAlign: TextAlign.center,
+                    fontWeight: FontWeight.bold, fontSize: Sizes.font8),
               ),
-              Text(
-                "If you do not have a license number please contact us.",
-                style: TextStyle(fontSize: Sizes.font9),
-                textAlign: TextAlign.center,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: Sizes.overallPadding),
-                child: TextFormField(
-                  controller: licenseController,
-                  onFieldSubmitted: submit,
-                  style: const TextStyle(
-                    color: Colors.black,
-                  ),
-                  textAlign: TextAlign.center,
-                  decoration: const InputDecoration(
-                    hintText: "LICENSE KEY",
-                    hintStyle: TextStyle(color: Colors.grey),
-                  ),
-                  validator: validator,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.done,
-                ),
-              ),
-              Text(
-                "License Number",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: Sizes.font6),
-              ),
-              SizedBox(
-                height: Sizes.overallPadding * 2,
-              ),
-              TextButton(
-                focusNode: _focusNode,
-                onPressed: () {
-                  submit(licenseController.text);
-                },
-                child: Text(
-                  "VALIDATE",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: Sizes.font8),
-                ),
-              ),
-              SizedBox(
-                height: Sizes.overallPadding * 2,
-              ),
-            ],
-          ),
+            ),
+            SizedBox(
+              height: Sizes.overallPadding * 2,
+            ),
+          ],
         ),
       ),
     );

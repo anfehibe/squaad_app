@@ -132,8 +132,8 @@ class _YTPlayerState extends State<YTPlayer> {
         autoPlay: true,
         mute: false,
         loop: false,
-        hideControls: true,
-        hideThumbnail: true,
+        hideControls: false,
+        hideThumbnail: false,
       ),
     );
     super.initState();
