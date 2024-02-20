@@ -80,7 +80,7 @@ class _PlayerState extends State<Player> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Sizes.screenWidth * 0.65,
+      width: Sizes.screenWidth * 0.7,
       child: Swiper(
         controller: swiperController,
         autoplay: false,
@@ -165,7 +165,7 @@ class SponsorAndInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Sizes.screenWidth * 0.35,
+      width: Sizes.screenWidth * 0.3,
       child: Column(
         children: [
           Container(
@@ -176,7 +176,7 @@ class SponsorAndInfo extends StatelessWidget {
             width: double.infinity,
             child: Image.asset(
               'assets/images/schools/0.jpg',
-              fit: BoxFit.fitHeight,
+              fit: BoxFit.fitWidth,
             ),
           ),
           Container(
