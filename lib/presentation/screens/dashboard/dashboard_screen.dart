@@ -1,8 +1,10 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../config/constants/sizes.dart';
+import '../../../domain/datasources/firebase_storage_datasource.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -34,7 +36,7 @@ class BodyDashboard extends StatelessWidget {
           Sizes.overallPadding,
       child: Row(
         children: const [
-          Player(),
+          PlayerSwipper(),
           SponsorAndInfo(),
         ],
       ),
@@ -42,33 +44,43 @@ class BodyDashboard extends StatelessWidget {
   }
 }
 
-class Player extends StatefulWidget {
-  const Player({
+class PlayerSwipper extends StatefulWidget {
+  const PlayerSwipper({
     super.key,
   });
 
   @override
-  State<Player> createState() => _PlayerState();
+  State<PlayerSwipper> createState() => _PlayerSwipperState();
 }
 
-class _PlayerState extends State<Player> {
-  final List<String> _ids = [
-    'DcLb2lX6los',
+class _PlayerSwipperState extends State<PlayerSwipper> {
+  // Instanciar el servicio de almacenamiento
+  final storageService = FirebaseStorageDatasource();
+  /* final List<String> _ids = [
+    // 'assets/videos/1.mp4',
+    // 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
     'es5Yefj0ncI',
     '0PA39XnRetE',
     'eW9XAiYWnPw',
-  ];
+  ]; */
   SwiperController swiperController = SwiperController();
 
   List<Map<String, String>> data = [];
   @override
   void initState() {
-    data = _ids.map((id) => {'type': 'video', 'url': id}).toList();
-    for (var i = 0; i < _ids.length; i++) {
-      data.add({'type': 'img', 'url': '$i'});
-    }
+    getVideos();
 
     super.initState();
+  }
+
+  getVideos() async {
+    // Obtener la lista de URLs de videos
+    List<String> videoUrls = await storageService.listVideos();
+
+    data = videoUrls.map((id) => {'type': 'video', 'url': id}).toList();
+    for (var i = 0; i < 4; i++) {
+      data.add({'type': 'img', 'url': '$i'});
+    }
   }
 
   @override
@@ -97,7 +109,7 @@ class _PlayerState extends State<Player> {
           } else {
             swiperController.stopAutoplay(animation: false);
 
-            return YTPlayer(
+            return PlayerV(
               swiperController: swiperController,
               url: data[index]['url']!,
             );
@@ -108,8 +120,8 @@ class _PlayerState extends State<Player> {
   }
 }
 
-class YTPlayer extends StatefulWidget {
-  const YTPlayer({
+class PlayerV extends StatefulWidget {
+  const PlayerV({
     super.key,
     required this.swiperController,
     required this.url,
@@ -118,49 +130,53 @@ class YTPlayer extends StatefulWidget {
   final String url;
 
   @override
-  State<YTPlayer> createState() => _YTPlayerState();
+  State<PlayerV> createState() => _PlayerVState();
 }
 
-class _YTPlayerState extends State<YTPlayer> {
-  YoutubePlayerController youtubeController =
-      YoutubePlayerController(initialVideoId: '');
+class _PlayerVState extends State<PlayerV> {
+  late VideoPlayerController _controller;
+
   @override
   void initState() {
-    youtubeController = YoutubePlayerController(
-      initialVideoId: widget.url,
-      flags: const YoutubePlayerFlags(
-        autoPlay: true,
-        mute: false,
-        loop: false,
-        hideControls: false,
-        hideThumbnail: false,
-      ),
-    );
     super.initState();
+
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..setVolume(1.0)
+      ..setLooping(false)
+      ..play();
+
+    _controller.addListener(() {
+      if (_controller.value.isCompleted) {
+        widget.swiperController.next();
+      }
+    });
   }
 
   @override
   void dispose() {
-    youtubeController.dispose();
+    // _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayer(
-      controller: youtubeController,
-      onReady: () {},
-      onEnded: (metaData) {
-        widget.swiperController.next();
+    return FutureBuilder(
+      future: _controller.initialize(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+
+        return VideoPlayer(_controller);
       },
     );
   }
 }
 
 class SponsorAndInfo extends StatelessWidget {
-  const SponsorAndInfo({
-    super.key,
-  });
+  const SponsorAndInfo({super.key});
 
   @override
   Widget build(BuildContext context) {
