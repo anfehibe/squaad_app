@@ -2,14 +2,12 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../config/constants/sizes.dart';
-import '../../../domain/datasources/firebase_storage_datasource.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
 
 class DashboardScreen extends StatelessWidget {
   static const name = 'dashboard';
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +15,8 @@ class DashboardScreen extends StatelessWidget {
         body: SizedBox(
       height: Sizes.screenHeight,
       width: Sizes.screenWidth,
-      child: Column(
-        children: const [HeaderDashboard(), BodyDashboard()],
+      child: const Column(
+        children: [HeaderDashboard(), BodyDashboard()],
       ),
     ));
   }
@@ -34,8 +32,8 @@ class BodyDashboard extends StatelessWidget {
     return SizedBox(
       height: Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
           Sizes.overallPadding,
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           PlayerSwipper(),
           SponsorAndInfo(),
         ],
@@ -55,14 +53,12 @@ class PlayerSwipper extends StatefulWidget {
 
 class _PlayerSwipperState extends State<PlayerSwipper> {
   // Instanciar el servicio de almacenamiento
-  final storageService = FirebaseStorageDatasource();
-  /* final List<String> _ids = [
-    // 'assets/videos/1.mp4',
-    // 'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
-    'es5Yefj0ncI',
-    '0PA39XnRetE',
-    'eW9XAiYWnPw',
-  ]; */
+  final List<String> _ids = [
+    'assets/videos/1.mp4',
+    'assets/videos/2.mp4',
+    'assets/videos/3.mp4',
+    'assets/videos/4.mp4',
+  ];
   SwiperController swiperController = SwiperController();
 
   List<Map<String, String>> data = [];
@@ -75,9 +71,8 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
 
   getVideos() async {
     // Obtener la lista de URLs de videos
-    List<String> videoUrls = await storageService.listVideos();
 
-    data = videoUrls.map((id) => {'type': 'video', 'url': id}).toList();
+    data = _ids.map((id) => {'type': 'video', 'url': id}).toList();
     for (var i = 0; i < 4; i++) {
       data.add({'type': 'img', 'url': '$i'});
     }
@@ -93,28 +88,31 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: Sizes.screenWidth * 0.7,
-      child: Swiper(
-        controller: swiperController,
-        autoplay: false,
-        loop: true,
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          if (data[index]['type'] == "img") {
-            swiperController.startAutoplay();
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: Sizes.boxSeparation),
+        child: Swiper(
+          controller: swiperController,
+          autoplay: false,
+          loop: true,
+          itemCount: data.length,
+          itemBuilder: (context, index) {
+            if (data[index]['type'] == "img") {
+              swiperController.startAutoplay();
 
-            return Image.asset(
-              'assets/images/swiper/${data[index]['url']}.jpg',
-              fit: BoxFit.fitHeight,
-            );
-          } else {
-            swiperController.stopAutoplay(animation: false);
+              return Image.asset(
+                'assets/images/swiper/${data[index]['url']}.jpg',
+                fit: BoxFit.fitHeight,
+              );
+            } else {
+              swiperController.stopAutoplay(animation: false);
 
-            return PlayerV(
-              swiperController: swiperController,
-              url: data[index]['url']!,
-            );
-          }
-        },
+              return PlayerV(
+                swiperController: swiperController,
+                url: data[index]['url']!,
+              );
+            }
+          },
+        ),
       ),
     );
   }
@@ -140,16 +138,15 @@ class _PlayerVState extends State<PlayerV> {
   void initState() {
     super.initState();
 
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+    _controller = VideoPlayerController.asset(widget.url)
       ..setVolume(1.0)
       ..setLooping(false)
+      ..addListener(() {
+        if (_controller.value.isCompleted) {
+          widget.swiperController.next();
+        }
+      })
       ..play();
-
-    _controller.addListener(() {
-      if (_controller.value.isCompleted) {
-        widget.swiperController.next();
-      }
-    });
   }
 
   @override
@@ -169,7 +166,9 @@ class _PlayerVState extends State<PlayerV> {
           );
         }
 
-        return VideoPlayer(_controller);
+        return AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller));
       },
     );
   }
@@ -234,8 +233,8 @@ class SponsorAndInfo extends StatelessWidget {
                 Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: Sizes.boxSeparation),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Text(
                         "Powered by:",
                         textAlign: TextAlign.start,

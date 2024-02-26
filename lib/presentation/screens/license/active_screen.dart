@@ -8,7 +8,7 @@ import '../../../domain/datasources/shared_preferences_datasource.dart';
 
 class ActiveLicenseScreen extends StatefulWidget {
   static const name = 'active-license';
-  const ActiveLicenseScreen({Key? key}) : super(key: key);
+  const ActiveLicenseScreen({super.key});
 
   @override
   State<ActiveLicenseScreen> createState() => _ActiveLicenseScreenState();
@@ -41,10 +41,10 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
       body: SizedBox(
         height: Sizes.screenHeight,
         width: Sizes.screenWidth,
-        child: SingleChildScrollView(
+        child: const SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Column(
-            children: const [Header(), Body()],
+            children: [Header(), Body()],
           ),
         ),
       ),
@@ -63,8 +63,8 @@ class Body extends StatelessWidget {
       height: Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
           Sizes.overallPadding,
       width: double.infinity,
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           FormValidateLicense(),
           ImageSports(),
         ],
