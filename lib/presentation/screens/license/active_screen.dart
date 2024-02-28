@@ -42,7 +42,7 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
         height: Sizes.screenHeight,
         width: Sizes.screenWidth,
         child: const SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
           child: Column(
             children: [Header(), Body()],
           ),

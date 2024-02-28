@@ -54,10 +54,7 @@ class PlayerSwipper extends StatefulWidget {
 class _PlayerSwipperState extends State<PlayerSwipper> {
   // Instanciar el servicio de almacenamiento
   final List<String> _ids = [
-    'assets/videos/1.mp4',
-    'assets/videos/2.mp4',
-    'assets/videos/3.mp4',
-    'assets/videos/4.mp4',
+    'assets/videos/1.MOV',
   ];
   SwiperController swiperController = SwiperController();
 
@@ -88,31 +85,28 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: Sizes.screenWidth * 0.7,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: Sizes.boxSeparation),
-        child: Swiper(
-          controller: swiperController,
-          autoplay: false,
-          loop: true,
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            if (data[index]['type'] == "img") {
-              swiperController.startAutoplay();
+      child: Swiper(
+        controller: swiperController,
+        autoplay: false,
+        loop: true,
+        itemCount: data.length,
+        itemBuilder: (context, index) {
+          if (data[index]['type'] == "img") {
+            swiperController.startAutoplay();
 
-              return Image.asset(
-                'assets/images/swiper/${data[index]['url']}.jpg',
-                fit: BoxFit.fitHeight,
-              );
-            } else {
-              swiperController.stopAutoplay(animation: false);
+            return Image.asset(
+              'assets/images/swiper/${data[index]['url']}.jpg',
+              fit: BoxFit.fitHeight,
+            );
+          } else {
+            swiperController.stopAutoplay(animation: false);
 
-              return PlayerV(
-                swiperController: swiperController,
-                url: data[index]['url']!,
-              );
-            }
-          },
-        ),
+            return PlayerV(
+              swiperController: swiperController,
+              url: data[index]['url']!,
+            );
+          }
+        },
       ),
     );
   }
@@ -151,7 +145,7 @@ class _PlayerVState extends State<PlayerV> {
 
   @override
   void dispose() {
-    // _controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -166,9 +160,11 @@ class _PlayerVState extends State<PlayerV> {
           );
         }
 
-        return AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller));
+        return Center(
+          child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: VideoPlayer(_controller)),
+        );
       },
     );
   }
