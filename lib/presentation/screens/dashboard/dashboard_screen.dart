@@ -89,6 +89,7 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
         controller: swiperController,
         autoplay: false,
         loop: true,
+        autoplayDisableOnInteraction: false,
         itemCount: data.length,
         itemBuilder: (context, index) {
           if (data[index]['type'] == "img") {
@@ -159,7 +160,6 @@ class _PlayerVState extends State<PlayerV> {
             child: CircularProgressIndicator.adaptive(),
           );
         }
-
         return Center(
           child: AspectRatio(
               aspectRatio: _controller.value.aspectRatio,
@@ -186,7 +186,7 @@ class SponsorAndInfo extends StatelessWidget {
                 0.50,
             width: double.infinity,
             child: Image.asset(
-              'assets/images/schools/0.jpg',
+              'assets/images/schools/WOKA.png',
               fit: BoxFit.fitWidth,
             ),
           ),
