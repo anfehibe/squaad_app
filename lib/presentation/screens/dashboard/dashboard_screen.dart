@@ -1,4 +1,4 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
@@ -56,13 +56,14 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
   final List<String> _ids = [
     'assets/videos/1.MOV',
   ];
-  SwiperController swiperController = SwiperController();
-
+  // SwiperController swiperController = SwiperController();
+  PageController pageController = PageController();
+  Timer? globalTimer;
+  int currentPageIndex = 0;
   List<Map<String, String>> data = [];
   @override
   void initState() {
     getVideos();
-
     super.initState();
   }
 
@@ -77,7 +78,9 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
 
   @override
   void dispose() {
-    swiperController.dispose();
+    // swiperController.dispose();
+    pageController.dispose();
+    globalTimer?.cancel();
     super.dispose();
   }
 
@@ -85,25 +88,32 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: Sizes.screenWidth * 0.7,
-      child: Swiper(
-        controller: swiperController,
-        autoplay: false,
-        loop: true,
-        autoplayDisableOnInteraction: false,
+      child: PageView.builder(
+        controller: pageController,
         itemCount: data.length,
         itemBuilder: (context, index) {
           if (data[index]['type'] == "img") {
-            swiperController.startAutoplay();
-
+            globalTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+              if (index == data.length - 1) {
+                timer.cancel();
+                globalTimer!.cancel();
+                pageController.jumpTo(0);
+              } else {
+                pageController.nextPage(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.ease,
+                );
+              }
+              timer.cancel();
+            });
             return Image.asset(
               'assets/images/swiper/${data[index]['url']}.jpg',
               fit: BoxFit.fitHeight,
             );
           } else {
-            swiperController.stopAutoplay(animation: false);
-
+            globalTimer?.cancel();
             return PlayerV(
-              swiperController: swiperController,
+              pageController: pageController,
               url: data[index]['url']!,
             );
           }
@@ -116,10 +126,10 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
 class PlayerV extends StatefulWidget {
   const PlayerV({
     super.key,
-    required this.swiperController,
+    required this.pageController,
     required this.url,
   });
-  final SwiperController swiperController;
+  final PageController pageController;
   final String url;
 
   @override
@@ -138,7 +148,8 @@ class _PlayerVState extends State<PlayerV> {
       ..setLooping(false)
       ..addListener(() {
         if (_controller.value.isCompleted) {
-          widget.swiperController.next();
+          widget.pageController.nextPage(
+              duration: const Duration(milliseconds: 500), curve: Curves.ease);
         }
       })
       ..play();

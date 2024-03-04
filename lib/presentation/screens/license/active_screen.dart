@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/constants/sizes.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
@@ -24,7 +23,6 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
           context.go('/dashboard');
         }
       }
-      FlutterNativeSplash.remove();
     });
 
     // WidgetsBinding.instance.addPostFrameCallback((_) async {});
