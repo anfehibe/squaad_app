@@ -16,6 +16,7 @@ class ActiveLicenseScreen extends StatefulWidget {
 class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
   @override
   initState() {
+    super.initState();
     SharedPreferencesDatasource.getLicense().then((value) {
       String? license = value;
       if (license != null) {
@@ -26,7 +27,6 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
     });
 
     // WidgetsBinding.instance.addPostFrameCallback((_) async {});
-    super.initState();
   }
 
   @override

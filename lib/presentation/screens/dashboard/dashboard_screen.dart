@@ -54,7 +54,7 @@ class PlayerSwipper extends StatefulWidget {
 class _PlayerSwipperState extends State<PlayerSwipper> {
   // Instanciar el servicio de almacenamiento
   final List<String> _ids = [
-    'assets/videos/1.MOV',
+    'assets/videos/01.mp4',
   ];
   // SwiperController swiperController = SwiperController();
   PageController pageController = PageController();
@@ -71,7 +71,8 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
     // Obtener la lista de URLs de videos
 
     data = _ids.map((id) => {'type': 'video', 'url': id}).toList();
-    for (var i = 0; i < 4; i++) {
+    int imagesCount = 0;
+    for (var i = 0; i < imagesCount; i++) {
       data.add({'type': 'img', 'url': '$i'});
     }
   }
@@ -145,12 +146,12 @@ class _PlayerVState extends State<PlayerV> {
 
     _controller = VideoPlayerController.asset(widget.url)
       ..setVolume(1.0)
-      ..setLooping(false)
+      ..setLooping(true)
       ..addListener(() {
-        if (_controller.value.isCompleted) {
+        /* if (_controller.value.isCompleted) {
           widget.pageController.nextPage(
               duration: const Duration(milliseconds: 500), curve: Curves.ease);
-        }
+        } */
       })
       ..play();
   }
