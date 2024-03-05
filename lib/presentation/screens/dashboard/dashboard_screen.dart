@@ -88,7 +88,7 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Sizes.screenWidth * 0.7,
+      width: Sizes.screenWidth * 0.65,
       child: PageView.builder(
         controller: pageController,
         itemCount: data.length,
@@ -188,10 +188,11 @@ class SponsorAndInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Sizes.screenWidth * 0.3,
+      width: Sizes.screenWidth * 0.35,
       child: Column(
         children: [
           Container(
+            padding: EdgeInsets.only(right: Sizes.boxSeparation * 2),
             color: Colors.black,
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
@@ -203,17 +204,19 @@ class SponsorAndInfo extends StatelessWidget {
             ),
           ),
           Container(
+            padding: EdgeInsets.only(right: Sizes.boxSeparation * 2),
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
                 0.25,
             color: Colors.white,
             child: Image.asset(
               "assets/images/Group10.png",
-              fit: BoxFit.cover,
+              fit: BoxFit.fitHeight,
               alignment: Alignment.centerLeft,
             ),
           ),
           Container(
+            padding: EdgeInsets.only(right: Sizes.boxSeparation * 2),
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
                 0.25,
@@ -237,7 +240,7 @@ class SponsorAndInfo extends StatelessWidget {
                       horizontal: Sizes.overallPadding * 3.39),
                   child: Image.asset(
                     "assets/images/LogoSQUAAD.png",
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fitWidth,
                   ),
                 ),
               ],
