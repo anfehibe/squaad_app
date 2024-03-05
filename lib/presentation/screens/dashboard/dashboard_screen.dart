@@ -207,28 +207,10 @@ class SponsorAndInfo extends StatelessWidget {
                     Sizes.overallPadding) *
                 0.25,
             color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: Sizes.boxSeparation),
-                  child: const Text(
-                    "Sponsors:",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: Sizes.boxSeparation * 3),
-                  child: Image.asset(
-                    "assets/images/sponsors.jpg",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
+            child: Image.asset(
+              "assets/images/Group10.png",
+              fit: BoxFit.cover,
+              alignment: Alignment.centerLeft,
             ),
           ),
           Container(
