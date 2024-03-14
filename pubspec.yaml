@@ -1,7 +1,7 @@
 name: squaad_app
 description: A new Flutter project.
 publish_to: "none"
-version: 0.1.11
+version: 0.1.12
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -14,7 +14,6 @@ dependencies:
   go_router: ^13.2.0
   shared_preferences: ^2.2.2
   video_player: ^2.7.2
-  youtube_player_flutter: ^9.0.0
 
 dev_dependencies:
   change_app_package_name: ^1.1.0
@@ -38,7 +37,6 @@ flutter:
   assets:
     - .env
     - assets/images/
-    - assets/images/swiper/
     - assets/images/schools/
     - assets/icons/
     - assets/videos/

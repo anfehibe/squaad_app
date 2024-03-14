@@ -54,7 +54,7 @@ class PlayerSwipper extends StatefulWidget {
 class _PlayerSwipperState extends State<PlayerSwipper> {
   // Instanciar el servicio de almacenamiento
   final List<String> _ids = [
-    'assets/videos/01.mp4',
+    'assets/videos/02.mp4',
   ];
   // SwiperController swiperController = SwiperController();
   PageController pageController = PageController();
