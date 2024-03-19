@@ -54,7 +54,7 @@ class PlayerSwipper extends StatefulWidget {
 class _PlayerSwipperState extends State<PlayerSwipper> {
   // Instanciar el servicio de almacenamiento
   final List<String> _ids = [
-    'assets/videos/02.mp4',
+    'assets/videos/ABC.mp4',
   ];
   // SwiperController swiperController = SwiperController();
   PageController pageController = PageController();
@@ -199,7 +199,7 @@ class SponsorAndInfo extends StatelessWidget {
                 0.50,
             width: double.infinity,
             child: Image.asset(
-              'assets/images/schools/WOKA.png',
+              'assets/images/schools/ABC.jpg',
               fit: BoxFit.fitWidth,
             ),
           ),
