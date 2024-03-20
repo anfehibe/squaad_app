@@ -14,6 +14,8 @@ class ActiveLicenseScreen extends StatefulWidget {
 }
 
 class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
+  bool loading = true;
+
   @override
   initState() {
     super.initState();
@@ -24,6 +26,9 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
           if (license == '123456789') {
             context.go('/dashboard');
           }
+          setState(() {
+            loading = false;
+          });
         }
       });
     });
@@ -39,12 +44,17 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
       body: SizedBox(
         height: Sizes.screenHeight,
         width: Sizes.screenWidth,
-        child: const SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
-          child: Column(
-            children: [Header(), Body()],
-          ),
-        ),
+        child: loading
+            ? const Center(
+                child: CircularProgressIndicator.adaptive(),
+              )
+            : const SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.manual,
+                child: Column(
+                  children: [Header(), Body()],
+                ),
+              ),
       ),
     );
   }

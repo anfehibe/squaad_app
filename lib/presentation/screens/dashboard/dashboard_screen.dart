@@ -54,7 +54,7 @@ class PlayerSwipper extends StatefulWidget {
 class _PlayerSwipperState extends State<PlayerSwipper> {
   // Instanciar el servicio de almacenamiento
   final List<String> _ids = [
-    'assets/videos/ABC.mp4',
+    'assets/videos/kidsPlanet.mp4',
   ];
   // SwiperController swiperController = SwiperController();
   PageController pageController = PageController();
@@ -144,7 +144,8 @@ class _PlayerVState extends State<PlayerV> {
   void initState() {
     super.initState();
 
-    _controller = VideoPlayerController.asset(widget.url)
+    _controller = VideoPlayerController.asset(widget.url,
+        videoPlayerOptions: VideoPlayerOptions())
       ..setVolume(1.0)
       ..setLooping(true)
       ..addListener(() {
@@ -199,7 +200,7 @@ class SponsorAndInfo extends StatelessWidget {
                 0.50,
             width: double.infinity,
             child: Image.asset(
-              'assets/images/schools/ABC.jpg',
+              'assets/images/schools/KidsPlanet.jpg',
               fit: BoxFit.fitWidth,
             ),
           ),
