@@ -19,18 +19,16 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
   @override
   initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Future.delayed(const Duration(seconds: 1)).then((value) async {
-        String? license = await SharedPreferencesDatasource.getLicense();
-        if (license != null) {
-          if (license == '123456789') {
-            context.go('/dashboard');
-          }
-          setState(() {
-            loading = false;
-          });
+    SharedPreferencesDatasource.getLicense().then((license) {
+      if (license != null) {
+        if (license == '123456789') {
+          context.go('/dashboard');
         }
-      });
+      }
+      return null;
+    });
+    setState(() {
+      loading = false;
     });
   }
 
