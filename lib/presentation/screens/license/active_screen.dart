@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:keep_screen_on/keep_screen_on.dart';
 import '../../../config/constants/sizes.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
 
@@ -37,6 +38,8 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     Sizes.initSizes(height, width);
+
+    KeepScreenOn.turnOff();
 
     return Scaffold(
       body: SizedBox(

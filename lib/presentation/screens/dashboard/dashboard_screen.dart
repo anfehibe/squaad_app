@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:keep_screen_on/keep_screen_on.dart';
 import 'package:video_player/video_player.dart';
 import '../../../config/constants/sizes.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
@@ -11,6 +12,7 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    KeepScreenOn.turnOn();
     return Scaffold(
         body: SizedBox(
       height: Sizes.screenHeight,
@@ -54,7 +56,7 @@ class PlayerSwipper extends StatefulWidget {
 class _PlayerSwipperState extends State<PlayerSwipper> {
   // Instanciar el servicio de almacenamiento
   final List<String> _ids = [
-    'assets/videos/kidsPlanet.mp4',
+    'assets/videos/WOKA.mp4',
   ];
   // SwiperController swiperController = SwiperController();
   PageController pageController = PageController();
@@ -200,7 +202,7 @@ class SponsorAndInfo extends StatelessWidget {
                 0.50,
             width: double.infinity,
             child: Image.asset(
-              'assets/images/schools/KidsPlanet.jpg',
+              'assets/images/schools/WOKA.png',
               fit: BoxFit.fitWidth,
             ),
           ),
