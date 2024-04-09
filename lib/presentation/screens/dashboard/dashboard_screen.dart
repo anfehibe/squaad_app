@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keep_screen_on/keep_screen_on.dart';
+import 'package:squaad_app/domain/blocs/license/license_bloc.dart';
+import 'package:squaad_app/domain/entities/license.dart';
 import 'package:video_player/video_player.dart';
 import '../../../config/constants/sizes.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
@@ -31,22 +34,33 @@ class BodyDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    License? license = BlocProvider.of<LicenseBloc>(context).state.license;
     return SizedBox(
       height: Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
           Sizes.overallPadding,
-      child: const Row(
-        children: [
-          PlayerSwipper(),
-          SponsorAndInfo(),
-        ],
-      ),
+      child: license != null
+          ? Row(
+              children: [
+                PlayerSwipper(
+                  license: license,
+                ),
+                SponsorAndInfo(
+                  license: license,
+                ),
+              ],
+            )
+          : const Center(
+              child: CircularProgressIndicator.adaptive(),
+            ),
     );
   }
 }
 
 class PlayerSwipper extends StatefulWidget {
+  final License license;
   const PlayerSwipper({
     super.key,
+    required this.license,
   });
 
   @override
@@ -54,29 +68,12 @@ class PlayerSwipper extends StatefulWidget {
 }
 
 class _PlayerSwipperState extends State<PlayerSwipper> {
-  // Instanciar el servicio de almacenamiento
-  final List<String> _ids = [
-    'assets/videos/WOKA.mp4',
-  ];
-  // SwiperController swiperController = SwiperController();
   PageController pageController = PageController();
   Timer? globalTimer;
   int currentPageIndex = 0;
-  List<Map<String, String>> data = [];
   @override
   void initState() {
-    getVideos();
     super.initState();
-  }
-
-  getVideos() async {
-    // Obtener la lista de URLs de videos
-
-    data = _ids.map((id) => {'type': 'video', 'url': id}).toList();
-    int imagesCount = 0;
-    for (var i = 0; i < imagesCount; i++) {
-      data.add({'type': 'img', 'url': '$i'});
-    }
   }
 
   @override
@@ -89,13 +86,14 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
 
   @override
   Widget build(BuildContext context) {
+    var data = widget.license.media;
     return SizedBox(
       width: Sizes.screenWidth * 0.65,
       child: PageView.builder(
         controller: pageController,
         itemCount: data.length,
         itemBuilder: (context, index) {
-          if (data[index]['type'] == "img") {
+          if (data[index].type == 1) {
             globalTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
               if (index == data.length - 1) {
                 timer.cancel();
@@ -109,15 +107,17 @@ class _PlayerSwipperState extends State<PlayerSwipper> {
               }
               timer.cancel();
             });
-            return Image.asset(
-              'assets/images/swiper/${data[index]['url']}.jpg',
+            return Image.network(
+              data[index].fileUrl,
               fit: BoxFit.fitHeight,
             );
           } else {
             globalTimer?.cancel();
             return PlayerV(
               pageController: pageController,
-              url: data[index]['url']!,
+              url: data[index].fileUrl,
+              lengthData: data.length,
+              currentIndex: index,
             );
           }
         },
@@ -131,9 +131,13 @@ class PlayerV extends StatefulWidget {
     super.key,
     required this.pageController,
     required this.url,
+    required this.lengthData,
+    required this.currentIndex,
   });
   final PageController pageController;
   final String url;
+  final int lengthData;
+  final int currentIndex;
 
   @override
   State<PlayerV> createState() => _PlayerVState();
@@ -146,15 +150,22 @@ class _PlayerVState extends State<PlayerV> {
   void initState() {
     super.initState();
 
-    _controller = VideoPlayerController.asset(widget.url,
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url),
         videoPlayerOptions: VideoPlayerOptions())
       ..setVolume(1.0)
-      ..setLooping(true)
+      ..setLooping(widget.lengthData == 1)
       ..addListener(() {
-        /* if (_controller.value.isCompleted) {
-          widget.pageController.nextPage(
-              duration: const Duration(milliseconds: 500), curve: Curves.ease);
-        } */
+        if (widget.lengthData != 1) {
+          if (_controller.value.isCompleted) {
+            if (widget.currentIndex == widget.lengthData - 1) {
+              widget.pageController.jumpTo(0);
+            } else {
+              widget.pageController.nextPage(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.ease);
+            }
+          }
+        }
       })
       ..play();
   }
@@ -186,7 +197,8 @@ class _PlayerVState extends State<PlayerV> {
 }
 
 class SponsorAndInfo extends StatelessWidget {
-  const SponsorAndInfo({super.key});
+  final License license;
+  const SponsorAndInfo({super.key, required this.license});
 
   @override
   Widget build(BuildContext context) {
@@ -201,8 +213,8 @@ class SponsorAndInfo extends StatelessWidget {
                     Sizes.overallPadding) *
                 0.50,
             width: double.infinity,
-            child: Image.asset(
-              'assets/images/schools/WOKA.png',
+            child: Image.network(
+              license.qrInfoUrl,
               fit: BoxFit.fitWidth,
             ),
           ),
@@ -212,8 +224,8 @@ class SponsorAndInfo extends StatelessWidget {
                     Sizes.overallPadding) *
                 0.25,
             color: Colors.white,
-            child: Image.asset(
-              "assets/images/Group10.png",
+            child: Image.network(
+              license.bannerUrl,
               fit: BoxFit.fitHeight,
               alignment: Alignment.centerLeft,
             ),
@@ -273,6 +285,7 @@ class HeaderDashboard extends StatelessWidget {
           InkWell(
             onLongPress: () {
               SharedPreferencesDatasource.saveLicense("");
+              BlocProvider.of<LicenseBloc>(context).add(InactiveLicense());
               context.go('/');
             },
             child: Padding(

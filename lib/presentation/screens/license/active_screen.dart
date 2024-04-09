@@ -1,8 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keep_screen_on/keep_screen_on.dart';
+import 'package:squaad_app/domain/blocs/license/license_bloc.dart';
+import 'package:squaad_app/domain/datasources/squaad_datasource.dart';
 import '../../../config/constants/sizes.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
 
@@ -22,9 +25,13 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
     super.initState();
     SharedPreferencesDatasource.getLicense().then((license) {
       if (license != null) {
-        if (license == '123456789') {
-          context.go('/dashboard');
-        }
+        SquaadApiProvider.getLicenceData(license).then((licenseData) {
+          if (licenseData != null) {
+            BlocProvider.of<LicenseBloc>(context)
+                .add(ActiveLicense(licenseData));
+            context.go('/dashboard');
+          }
+        });
       }
       return null;
     });
@@ -112,9 +119,6 @@ class _FormValidateLicenseState extends State<FormValidateLicense> {
       if (value == null || value.isEmpty || value.trim().isEmpty) {
         return 'License key is required';
       }
-      if (value != '123456789') {
-        return 'License not found';
-      }
       return null;
     }
 
@@ -122,8 +126,15 @@ class _FormValidateLicenseState extends State<FormValidateLicense> {
       final isValid = formKey.currentState!.validate();
       // Guardar la licencia
       if (isValid) {
-        SharedPreferencesDatasource.saveLicense(licenseController.text);
-        context.go('/dashboard');
+        SquaadApiProvider.getLicenceData(licenseController.text)
+            .then((licenseData) {
+          if (licenseData != null) {
+            SharedPreferencesDatasource.saveLicense(licenseController.text);
+            BlocProvider.of<LicenseBloc>(context)
+                .add(ActiveLicense(licenseData));
+            context.go('/dashboard');
+          }
+        });
       }
     }
 
