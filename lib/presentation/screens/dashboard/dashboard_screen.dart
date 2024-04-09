@@ -1,22 +1,24 @@
-import 'package:card_swiper/card_swiper.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:keep_screen_on/keep_screen_on.dart';
+import 'package:video_player/video_player.dart';
 import '../../../config/constants/sizes.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
 
 class DashboardScreen extends StatelessWidget {
   static const name = 'dashboard';
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    KeepScreenOn.turnOn();
     return Scaffold(
         body: SizedBox(
       height: Sizes.screenHeight,
       width: Sizes.screenWidth,
-      child: Column(
-        children: const [HeaderDashboard(), BodyDashboard()],
+      child: const Column(
+        children: [HeaderDashboard(), BodyDashboard()],
       ),
     ));
   }
@@ -32,9 +34,9 @@ class BodyDashboard extends StatelessWidget {
     return SizedBox(
       height: Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
           Sizes.overallPadding,
-      child: Row(
-        children: const [
-          Player(),
+      child: const Row(
+        children: [
+          PlayerSwipper(),
           SponsorAndInfo(),
         ],
       ),
@@ -42,63 +44,79 @@ class BodyDashboard extends StatelessWidget {
   }
 }
 
-class Player extends StatefulWidget {
-  const Player({
+class PlayerSwipper extends StatefulWidget {
+  const PlayerSwipper({
     super.key,
   });
 
   @override
-  State<Player> createState() => _PlayerState();
+  State<PlayerSwipper> createState() => _PlayerSwipperState();
 }
 
-class _PlayerState extends State<Player> {
+class _PlayerSwipperState extends State<PlayerSwipper> {
+  // Instanciar el servicio de almacenamiento
   final List<String> _ids = [
-    'DcLb2lX6los',
-    'es5Yefj0ncI',
-    '0PA39XnRetE',
-    'eW9XAiYWnPw',
+    'assets/videos/WOKA.mp4',
   ];
-  SwiperController swiperController = SwiperController();
-
+  // SwiperController swiperController = SwiperController();
+  PageController pageController = PageController();
+  Timer? globalTimer;
+  int currentPageIndex = 0;
   List<Map<String, String>> data = [];
   @override
   void initState() {
+    getVideos();
+    super.initState();
+  }
+
+  getVideos() async {
+    // Obtener la lista de URLs de videos
+
     data = _ids.map((id) => {'type': 'video', 'url': id}).toList();
-    for (var i = 0; i < _ids.length; i++) {
+    int imagesCount = 0;
+    for (var i = 0; i < imagesCount; i++) {
       data.add({'type': 'img', 'url': '$i'});
     }
-
-    super.initState();
   }
 
   @override
   void dispose() {
-    swiperController.dispose();
+    // swiperController.dispose();
+    pageController.dispose();
+    globalTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Sizes.screenWidth * 0.7,
-      child: Swiper(
-        controller: swiperController,
-        autoplay: false,
-        loop: true,
+      width: Sizes.screenWidth * 0.65,
+      child: PageView.builder(
+        controller: pageController,
         itemCount: data.length,
         itemBuilder: (context, index) {
           if (data[index]['type'] == "img") {
-            swiperController.startAutoplay();
-
+            globalTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+              if (index == data.length - 1) {
+                timer.cancel();
+                globalTimer!.cancel();
+                pageController.jumpTo(0);
+              } else {
+                pageController.nextPage(
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.ease,
+                );
+              }
+              timer.cancel();
+            });
             return Image.asset(
               'assets/images/swiper/${data[index]['url']}.jpg',
               fit: BoxFit.fitHeight,
             );
           } else {
-            swiperController.stopAutoplay(animation: false);
-
-            return YTPlayer(
-              swiperController: swiperController,
+            globalTimer?.cancel();
+            return PlayerV(
+              pageController: pageController,
               url: data[index]['url']!,
             );
           }
@@ -108,107 +126,100 @@ class _PlayerState extends State<Player> {
   }
 }
 
-class YTPlayer extends StatefulWidget {
-  const YTPlayer({
+class PlayerV extends StatefulWidget {
+  const PlayerV({
     super.key,
-    required this.swiperController,
+    required this.pageController,
     required this.url,
   });
-  final SwiperController swiperController;
+  final PageController pageController;
   final String url;
 
   @override
-  State<YTPlayer> createState() => _YTPlayerState();
+  State<PlayerV> createState() => _PlayerVState();
 }
 
-class _YTPlayerState extends State<YTPlayer> {
-  YoutubePlayerController youtubeController =
-      YoutubePlayerController(initialVideoId: '');
+class _PlayerVState extends State<PlayerV> {
+  late VideoPlayerController _controller;
+
   @override
   void initState() {
-    youtubeController = YoutubePlayerController(
-      initialVideoId: widget.url,
-      flags: const YoutubePlayerFlags(
-        autoPlay: true,
-        mute: false,
-        loop: false,
-        hideControls: false,
-        hideThumbnail: false,
-      ),
-    );
     super.initState();
+
+    _controller = VideoPlayerController.asset(widget.url,
+        videoPlayerOptions: VideoPlayerOptions())
+      ..setVolume(1.0)
+      ..setLooping(true)
+      ..addListener(() {
+        /* if (_controller.value.isCompleted) {
+          widget.pageController.nextPage(
+              duration: const Duration(milliseconds: 500), curve: Curves.ease);
+        } */
+      })
+      ..play();
   }
 
   @override
   void dispose() {
-    youtubeController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayer(
-      controller: youtubeController,
-      onReady: () {},
-      onEnded: (metaData) {
-        widget.swiperController.next();
+    return FutureBuilder(
+      future: _controller.initialize(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+        return Center(
+          child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: VideoPlayer(_controller)),
+        );
       },
     );
   }
 }
 
 class SponsorAndInfo extends StatelessWidget {
-  const SponsorAndInfo({
-    super.key,
-  });
+  const SponsorAndInfo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: Sizes.screenWidth * 0.3,
+      width: Sizes.screenWidth * 0.35,
       child: Column(
         children: [
           Container(
+            padding: EdgeInsets.only(right: Sizes.boxSeparation * 2),
             color: Colors.black,
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
                 0.50,
             width: double.infinity,
             child: Image.asset(
-              'assets/images/schools/0.jpg',
+              'assets/images/schools/WOKA.png',
               fit: BoxFit.fitWidth,
             ),
           ),
           Container(
+            padding: EdgeInsets.only(right: Sizes.boxSeparation * 2),
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
                 0.25,
             color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: Sizes.boxSeparation),
-                  child: const Text(
-                    "Sponsors:",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: Sizes.boxSeparation * 3),
-                  child: Image.asset(
-                    "assets/images/sponsors.jpg",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
+            child: Image.asset(
+              "assets/images/Group10.png",
+              fit: BoxFit.fitHeight,
+              alignment: Alignment.centerLeft,
             ),
           ),
           Container(
+            padding: EdgeInsets.only(right: Sizes.boxSeparation * 2),
             height: (Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
                     Sizes.overallPadding) *
                 0.25,
@@ -218,8 +229,8 @@ class SponsorAndInfo extends StatelessWidget {
                 Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: Sizes.boxSeparation),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Text(
                         "Powered by:",
                         textAlign: TextAlign.start,
@@ -232,7 +243,7 @@ class SponsorAndInfo extends StatelessWidget {
                       horizontal: Sizes.overallPadding * 3.39),
                   child: Image.asset(
                     "assets/images/LogoSQUAAD.png",
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fitWidth,
                   ),
                 ),
               ],

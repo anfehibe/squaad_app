@@ -1,10 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.acubillos.squaad_app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-            android:label="squaad_app"
+            android:label="Squaad"
             android:name="${applicationName}"
             android:icon="@mipmap/launcher_icon">
         <activity

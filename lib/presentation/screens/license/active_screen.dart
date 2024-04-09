@@ -1,34 +1,36 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
+import 'package:keep_screen_on/keep_screen_on.dart';
 import '../../../config/constants/sizes.dart';
 import '../../../domain/datasources/shared_preferences_datasource.dart';
 
 class ActiveLicenseScreen extends StatefulWidget {
   static const name = 'active-license';
-  const ActiveLicenseScreen({Key? key}) : super(key: key);
+  const ActiveLicenseScreen({super.key});
 
   @override
   State<ActiveLicenseScreen> createState() => _ActiveLicenseScreenState();
 }
 
 class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
+  bool loading = true;
+
   @override
   initState() {
-    SharedPreferencesDatasource.getLicense().then((value) {
-      String? license = value;
+    super.initState();
+    SharedPreferencesDatasource.getLicense().then((license) {
       if (license != null) {
         if (license == '123456789') {
           context.go('/dashboard');
         }
       }
-      FlutterNativeSplash.remove();
+      return null;
     });
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {});
-    super.initState();
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -37,16 +39,23 @@ class _ActiveLicenseScreenState extends State<ActiveLicenseScreen> {
     double width = MediaQuery.of(context).size.width;
     Sizes.initSizes(height, width);
 
+    KeepScreenOn.turnOff();
+
     return Scaffold(
       body: SizedBox(
         height: Sizes.screenHeight,
         width: Sizes.screenWidth,
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Column(
-            children: const [Header(), Body()],
-          ),
-        ),
+        child: loading
+            ? const Center(
+                child: CircularProgressIndicator.adaptive(),
+              )
+            : const SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.manual,
+                child: Column(
+                  children: [Header(), Body()],
+                ),
+              ),
       ),
     );
   }
@@ -63,8 +72,8 @@ class Body extends StatelessWidget {
       height: Sizes.screenHeight * (1 - Sizes.headerHeigthPercentage) -
           Sizes.overallPadding,
       width: double.infinity,
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           FormValidateLicense(),
           ImageSports(),
         ],
