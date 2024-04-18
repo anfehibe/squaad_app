@@ -13,7 +13,7 @@ class Academy {
   String city;
   int stateId;
   String zipcode;
-  String image;
+  String? image;
   DateTime createdAt;
   DateTime updatedAt;
   dynamic deletedAt;
