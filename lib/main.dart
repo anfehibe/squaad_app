@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +20,8 @@ Future<void> main() async {
     DeviceOrientation.landscapeRight,
   ]);
   await SharedPreferencesDatasource.init();
+
+  HttpOverrides.global = MyHttpOverrides();
 
   runApp(const AppState());
 }
@@ -45,5 +49,14 @@ class MainApp extends StatelessWidget {
       routerConfig: appRouter,
       theme: AppTheme().getTheme(),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }

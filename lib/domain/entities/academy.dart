@@ -2,43 +2,43 @@ import 'dart:convert';
 
 class Academy {
   int id;
-  int userId;
+  int? userId;
   String name;
-  int feePercentage;
-  String fee;
-  String email;
-  String mobile;
-  String website;
-  String address;
-  String city;
-  int stateId;
-  String zipcode;
+  int? feePercentage;
+  String? fee;
+  String? email;
+  String? mobile;
+  String? website;
+  String? address;
+  String? city;
+  int? stateId;
+  String? zipcode;
   String? image;
   DateTime createdAt;
   DateTime updatedAt;
   dynamic deletedAt;
-  String mobileMask;
-  String imageUrl;
+  String? mobileMask;
+  String? imageUrl;
 
   Academy({
     required this.id,
-    required this.userId,
+    this.userId,
     required this.name,
-    required this.feePercentage,
-    required this.fee,
-    required this.email,
-    required this.mobile,
-    required this.website,
-    required this.address,
-    required this.city,
-    required this.stateId,
-    required this.zipcode,
-    required this.image,
+    this.feePercentage,
+    this.fee,
+    this.email,
+    this.mobile,
+    this.website,
+    this.address,
+    this.city,
+    this.stateId,
+    this.zipcode,
+    this.image,
     required this.createdAt,
     required this.updatedAt,
-    required this.deletedAt,
-    required this.mobileMask,
-    required this.imageUrl,
+    this.deletedAt,
+    this.mobileMask,
+    this.imageUrl,
   });
 
   factory Academy.fromRawJson(String str) => Academy.fromJson(json.decode(str));
@@ -47,7 +47,6 @@ class Academy {
 
   factory Academy.fromJson(Map<String, dynamic> json) => Academy(
         id: json["id"],
-        userId: json["user_id"],
         name: json["name"],
         feePercentage: json["fee_percentage"],
         fee: json["fee"],
